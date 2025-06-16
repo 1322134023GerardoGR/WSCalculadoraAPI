@@ -1,11 +1,17 @@
-﻿# Usa la imagen oficial de .NET SDK para construir
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+﻿# Etapa de construcción
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY . .
-RUN dotnet publish "CalculadoraAPI.csproj" -c Release -o /app/publish
 
-# Usa la imagen oficial de .NET Runtime para ejecutar
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
+# Copia SOLO el archivo .csproj y restaura dependencias
+COPY *.csproj .
+RUN dotnet restore
+
+# Copia el resto y publica
+COPY . .
+RUN dotnet publish -c Release -o /app/publish
+
+# Etapa de ejecución
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/publish .
-ENTRYPOINT ["dotnet", "CalculadoraAPI.dll"]
+ENTRYPOINT ["dotnet", "WSCalculadoraAPI.dll"]
