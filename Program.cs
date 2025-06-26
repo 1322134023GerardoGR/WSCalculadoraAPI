@@ -1,15 +1,25 @@
+using Microsoft.EntityFrameworkCore;
+using WSCalculadoraAPI.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Configuración de la base de datos
+builder.Services.AddDbContext<CalculadoraContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("CalculadoraDB")));
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Aplicar migraciones automáticamente
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<CalculadoraContext>();
+    db.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
