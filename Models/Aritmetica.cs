@@ -15,7 +15,7 @@ namespace WSCalculadoraAPI.Models
         public double Num2 { get; set; }
 
         [Column("operation")]
-        public string Operation { get; set; }
+        public string? Operation { get; set; }
 
         [Column("result")]
         public double Result { get; set; }

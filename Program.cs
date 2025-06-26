@@ -51,5 +51,5 @@ static string ConvertRenderUrlToConnectionString(string url, bool useSsl = true)
 {
     var uri = new Uri(url);
     var userInfo = uri.UserInfo.Split(':');
-    return $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};{(useSsl ? "SSL Mode=Require;Trust Server Certificate=true;" : "")}";
+    return $"Host={uri.Host};Port={uri.Port};Database='calculadora_v6c8';Username={userInfo[0]};Password={userInfo[1]};{(useSsl ? "SSL Mode=Require;Trust Server Certificate=true;" : "")}";
 }

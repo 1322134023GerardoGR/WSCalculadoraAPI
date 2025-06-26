@@ -15,11 +15,11 @@ namespace WSCalculadoraAPI.Data
         {
             modelBuilder.Entity<Aritmetica>(entity =>
             {
-                entity.ToTable("Calculadora");
+                entity.ToTable("public.Calculadora");
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.Num1).HasColumnName("num1");
                 entity.Property(e => e.Num2).HasColumnName("num2");
-                entity.Property(e => e.Operation).HasColumnName("operation");
+                entity.Property(e => e.Operation).HasColumnName("operation").IsRequired(false);
                 entity.Property(e => e.Result).HasColumnName("result");
                 entity.Property(e => e.CreatedAt).HasColumnName("createdat");
             });
