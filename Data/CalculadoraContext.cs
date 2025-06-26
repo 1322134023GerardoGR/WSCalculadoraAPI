@@ -21,7 +21,7 @@ namespace WSCalculadoraAPI.Data
                 entity.Property(e => e.Num2).HasColumnName("num2");
                 entity.Property(e => e.Operation).HasColumnName("operation").IsRequired(false);
                 entity.Property(e => e.Result).HasColumnName("result");
-                entity.Property(e => e.CreatedAt).HasColumnName("createdat");
+                entity.Property(e => e.CreatedAt).HasColumnName("createdat").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
         }
     }

@@ -3,16 +3,11 @@ using WSCalculadoraAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration
-    .AddJsonFile("appsettings.json")
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-    .AddEnvironmentVariables()
-    .AddKeyPerFile("/etc/secrets", optional: true);
-
-var dbUrl = builder.Configuration["DB_URL_INTERNA"];
-var connectionString = dbUrl != null && dbUrl.StartsWith("postgresql://")
-    ? ConvertRenderUrlToConnectionString(dbUrl, useSsl: false)
-    : builder.Configuration.GetConnectionString("calculadora_v6c8");
+// Configuración directa de la cadena de conexión interna
+var connectionString = "Host=dpg-d1erbobe5dus73953qf0-a;Port=5432;" +
+                      "Database=calculadora_v6c8;Username=root;" +
+                      "Password=xzzzerg7c3CFzFhhvxutzFzXSzUiMjsN;" +
+                      "SSL Mode=Prefer;Trust Server Certificate=true";
 
 builder.Services.AddDbContext<CalculadoraContext>(options =>
     options.UseNpgsql(connectionString));
@@ -23,16 +18,27 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Aplicación de migraciones con verificación robusta
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<CalculadoraContext>();
     try
     {
-        db.Database.Migrate();
+        Console.WriteLine("Verificando conexión a la base de datos...");
+        if (await db.Database.CanConnectAsync())
+        {
+            Console.WriteLine("Aplicando migraciones...");
+            await db.Database.MigrateAsync();
+            Console.WriteLine("Migraciones aplicadas correctamente");
+        }
+        else
+        {
+            Console.WriteLine("No se pudo conectar a la base de datos");
+        }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error applying migrations: {ex.Message}");
+        Console.WriteLine($"Error en migraciones: {ex.Message}");
     }
 }
 
@@ -46,10 +52,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run($"http://*:{Environment.GetEnvironmentVariable("PORT") ?? "5000"}");
-
-static string ConvertRenderUrlToConnectionString(string url, bool useSsl = true)
-{
-    var uri = new Uri(url);
-    var userInfo = uri.UserInfo.Split(':');
-    return $"Host={uri.Host};Port={uri.Port};Database='calculadora_v6c8';Username={userInfo[0]};Password={userInfo[1]};{(useSsl ? "SSL Mode=Require;Trust Server Certificate=true;" : "")}";
-}
