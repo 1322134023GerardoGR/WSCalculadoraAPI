@@ -15,7 +15,7 @@ namespace WSCalculadoraAPI.Data
         {
             modelBuilder.Entity<Aritmetica>(entity =>
             {
-                entity.ToTable("Calculadora");
+                entity.ToTable("calculadora");
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.Num1).HasColumnName("num1");
                 entity.Property(e => e.Num2).HasColumnName("num2");
