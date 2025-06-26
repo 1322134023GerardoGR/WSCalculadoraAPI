@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configuración de la base de datos
 builder.Services.AddDbContext<CalculadoraContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("CalculadoraDB")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("calculadora")));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
