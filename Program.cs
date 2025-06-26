@@ -3,9 +3,19 @@ using WSCalculadoraAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuración de la base de datos
+builder.Configuration
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables()
+    .AddKeyPerFile("/etc/secrets", optional: true);
+
+var dbUrl = builder.Configuration["DB_URL_INTERNA"];
+var connectionString = dbUrl != null && dbUrl.StartsWith("postgresql://")
+    ? ConvertRenderUrlToConnectionString(dbUrl, useSsl: false)
+    : builder.Configuration.GetConnectionString("calculadora_v6c8");
+
 builder.Services.AddDbContext<CalculadoraContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("calculadora")));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -13,11 +23,17 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Aplicar migraciones automáticamente
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<CalculadoraContext>();
-    db.Database.Migrate();
+    try
+    {
+        db.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error applying migrations: {ex.Message}");
+    }
 }
 
 if (app.Environment.IsDevelopment())
@@ -27,7 +43,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run($"http://*:{Environment.GetEnvironmentVariable("PORT") ?? "5000"}");
+
+static string ConvertRenderUrlToConnectionString(string url, bool useSsl = true)
+{
+    var uri = new Uri(url);
+    var userInfo = uri.UserInfo.Split(':');
+    return $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};{(useSsl ? "SSL Mode=Require;Trust Server Certificate=true;" : "")}";
+}

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using WSCalculadoraAPI.Models;
 
 namespace WSCalculadoraAPI.Data
@@ -10,6 +9,20 @@ namespace WSCalculadoraAPI.Data
         {
         }
 
-        public DbSet<Aritmetica> Calculadora { get; set; } 
+        public DbSet<Aritmetica> Calculadora { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Aritmetica>(entity =>
+            {
+                entity.ToTable("Calculadora");
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Num1).HasColumnName("num1");
+                entity.Property(e => e.Num2).HasColumnName("num2");
+                entity.Property(e => e.Operation).HasColumnName("operation");
+                entity.Property(e => e.Result).HasColumnName("result");
+                entity.Property(e => e.CreatedAt).HasColumnName("createdat");
+            });
+        }
     }
 }
