@@ -21,6 +21,6 @@ namespace WSCalculadoraAPI.Models
         public double Result { get; set; }
 
         [Column("createdat")]
-        public DateTime CreatedAt { get; set; };
+        public DateTime CreatedAt { get; set; }
     }
 }
