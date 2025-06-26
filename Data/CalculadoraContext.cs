@@ -10,6 +10,6 @@ namespace WSCalculadoraAPI.Data
         {
         }
 
-        public DbSet<Aritmetica> Calculadora { get; set; } // Tabla se llamará "Calculadora"
+        public DbSet<Aritmetica> Calculadora { get; set; } 
     }
 }

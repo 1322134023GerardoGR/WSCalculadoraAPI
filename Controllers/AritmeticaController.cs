@@ -55,8 +55,8 @@ namespace WSCalculadoraAPI.Controllers
             {
                 Num1 = num1,
                 Num2 = num2,
-                Operacion = operacion,
-                Resultado = resultado
+                Operation = operacion,
+                Result = resultado
             };
 
             _context.Calculadora.Add(registro);
