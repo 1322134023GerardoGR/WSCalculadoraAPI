@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WSCalculadoraAPI.Data;
 using WSCalculadoraAPI.Models;
 
@@ -47,6 +48,12 @@ namespace WSCalculadoraAPI.Controllers
             var resultado = num1 / num2;
             await GuardarOperacion(num1, num2, "division", resultado);
             return resultado;
+        }
+
+        [HttpGet("Historial")]
+        public async Task<ActionResult<IEnumerable<Aritmetica>>> ObtenerHistorial()
+        {
+            return await _context.Calculadora.OrderByDescending(x => x.CreatedAt).ToListAsync();
         }
 
         private async Task GuardarOperacion(double num1, double num2, string operacion, double resultado)
